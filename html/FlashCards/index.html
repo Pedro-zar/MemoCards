@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../css/index.css" />
+    <title>Memo Cards</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1 v-text="deckName"></h1>
+
+      <!--
+        <div class="user-input">
+          Digite algo: <input type="text" v-model="userInput" />
+        </div>
+      -->
+      <flash-card
+        @flip="flipped = !flipped"
+        @yes="gotIt"
+        @no="again"
+        :flipped="flipped"
+        :back="back"
+        :front="front"
+        :is-repeat="isRepeat"
+      ></flash-card>
+
+      <div class="navigation">
+        <button @click="move(-1)" type="button">&#8592;</button
+        ><button @click="move(1)" type="button">&#8594;</button>
+      </div>
+
+      <read-more url="readMoreUrl">
+        <template v-slot:copyright="props"
+          ><p>&copy; {{props.year}} MemoCards App</p></template
+        >
+      </read-more>
+    </div>
+
+    <script src="../../js/FlashCards/data.js"></script>
+    <script src="https://unpkg.com/vue@3.2.27/dist/vue.global.js"></script>
+    <script>
+      const MemoCardsApp = {
+        data() {
+          return {
+            deckName: "Vue.js basics",
+            cards,
+            flipped: false,
+            readMoreUrl: "https://v3.vuejs.org/guide/introduction.html",
+            //userInput: "padrão",
+            index: 0,
+          };
+        },
+        methods: {
+          move(change) {
+            if (this.cards[this.index + change]) {
+              this.index += change;
+            } else {
+              this.index = change == 1 ? 0 : this.cards.length - 1;
+            }
+            this.flipped = false;
+          },
+          gotIt() {
+            if (this.cards.length === 1) return alert("Fim! Parabéns");
+            this.cards.splice(this.index, 1);
+            if (!this.cards[this.index]) this.index = 0;
+            this.flipped = false;
+          },
+          again() {
+            this.cards[this.index].isRepeat = true;
+            this.move(1);
+          },
+        },
+        computed: {
+          front() {
+            return this.cards[this.index].front;
+          },
+          back() {
+            return this.cards[this.index].back;
+          },
+          isRepeat() {
+            return this.cards[this.index].isRepeat;
+          },
+        },
+      };
+
+      const app = Vue.createApp(MemoCardsApp);
+
+      app.component("read-more", {
+        template:
+          '<a :href="url"><slot>Saiba mais</slot></a><slot :year="year" name="copyright"></slot>',
+        name: "ReadMore",
+        props: ["url"],
+        data() {
+          return {
+            year: 2021,
+          };
+        },
+      });
+
+      //v-cloak aqui mascara o {{front}} até ser carregado
+      //v-show aqui mostra só se a condição for atendida, mas já está carregado
+      //v-if e v-else funcionaria aqui para renderizar na hora do click apenas
+      app.component("flash-card", {
+        template: `
+          <div @click="$emit('flip')" :class="{again: isRepeat}" class="card">
+            <h2 v-if="!flipped" v-text="front"></h2>
+            <div v-else>
+              <div v-html="back"></div>
+              <div class="score">
+                <button @click.stop="$emit('yes')">Consegui!</button>
+                <button @click.stop="$emit('no')">De novo!</button>
+              </div>
+            </div>
+          </div>
+        `,
+        name: "FlashCard",
+        props: ["flipped", "isRepeat", "front", "back"],
+        //poderia usar um data(){isFlipped: flipped}
+      });
+
+      app.mount("#app");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../css/index.css" />
+    <title>Memo Cards</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>Propriedades do Baralho</h1>
+
+      <form method="post" action="">
+        <div>
+          <label for="name">Nome: </label>
+          <input v-model.trim="deckName" type="text" id="name" name="name" />
+          ({{deckName.length }} caracteres)
+        </div>
+
+        <div>
+          <label for="description">Descrição: </label>
+          <!--
+            se eu quisesse em vez de atualizar o numero sempre, só atualizar 
+            quando sair dessa text area, seria só usar um .lazy em vez de .trim
+          -->
+          <textarea
+            id="description"
+            v-model.trim="deckDescription"
+            name="description"
+          ></textarea>
+          ({{ charsLeft }}/200)
+        </div>
+
+        <div class="options">
+          <div>
+            <input
+              v-model="options"
+              type="checkbox"
+              id="reverse"
+              value="reverse"
+            />
+            <label for="reverse">Incluir cartas invertidas</label>
+          </div>
+
+          <div>
+            <input
+              v-model="options"
+              type="checkbox"
+              id="time_limit"
+              value="time_limit"
+            />
+            <label for="time_limit">Usar limite de tempo</label>
+          </div>
+
+          <div>
+            <input
+              v-model="options"
+              type="checkbox"
+              id="reminders"
+              value="reminders"
+            />
+            <label for="reminders">Habilitar lembretes</label>
+          </div>
+
+          <fieldset class="leech-action">
+            <legend>Leech Action</legend>
+            <div>
+              <input
+                v-model="leech"
+                type="radio"
+                id="tag"
+                name="leech"
+                value="tag"
+              />
+              <label for="tag">Marcar</label>
+            </div>
+            <div>
+              <input
+                v-model="leech"
+                type="radio"
+                id="suspend"
+                name="leech"
+                value="suspend"
+              />
+              <label for="suspend">Suspender</label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="category">
+          <label for="category">Categoria:</label>
+          <select v-model.number="categoryId" name="category" id="category">
+            <option value="">Selecione</option>
+            <option value="1">Língua Estrangeira</option>
+            <option value="2">Historia</option>
+            <option value="3">Biologia</option>
+            <option value="4">Geografia</option>
+            <option value="5">Lei</option>
+            <option value="6">Programação</option>
+          </select>
+        </div>
+
+        <button @click.prevent="submit" type="submit">Criar</button>
+      </form>
+    </div>
+
+    <script src="https://unpkg.com/vue@3.0.7/dist/vue.global.js"></script>
+    <script>
+      const FlashCardApp = {
+        data() {
+          return {
+            deckName: "Vue.js Basics",
+            deckDescription:
+              "Conceitos principais e necessários para trabalhar com Vue.js",
+            options: [],
+            leech: "tag",
+            categoryId: "",
+          };
+        },
+        computed: {
+          charsLeft() {
+            return 200 - this.deckDescription.length;
+          },
+        },
+        methods: {
+          submit() {
+            alert("Criando...");
+          },
+        },
+      };
+
+      const app = Vue.createApp(FlashCardApp).mount("#app");
+    </script>
+  </body>
+</html>
